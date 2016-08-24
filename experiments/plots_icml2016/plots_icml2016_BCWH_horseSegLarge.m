@@ -1,3 +1,5 @@
+% Figure 6 HorseSeg-large
+
 %% init
 methodDisplayName = cell(0,0);
 methodFile = cell(0,0);

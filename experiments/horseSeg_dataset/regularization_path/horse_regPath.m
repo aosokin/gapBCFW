@@ -1,23 +1,34 @@
-function horse_small_BCFW_hybrid(dataPath, resultPath, lambda, gap_threshold, num_passes, time_budget, sample, useCache, cacheNu, cacheFactor, maxCacheSize, stepType, gap_check, rand_seed )
+function horse_regPath(dataPath, resultPath, time_budget, ...
+    true_gap, A, AplusB, stepType, eps_reg_path, gap_check, sample, useCache, ...
+    num_passes, maxCacheSize, cacheNu, cacheFactor, rand_seed, datasetName)
 
-lambda
-gap_threshold
-num_passes
+dataPath
+resultPath
 time_budget
+true_gap
+A
+AplusB
+stepType
+eps_reg_path
+gap_check
 sample
 useCache
+num_passes
+maxCacheSize
 cacheNu
 cacheFactor
-maxCacheSize
-stepType
-gap_check
 rand_seed
+datasetName
 
 %% prepare the dataset
 param = struct;
 param.data_path = dataPath;
-param.data_name = 'horseSeg_small'; % 'horseSeg_small' or 'horseSeg_medium' or 'horseSeg_large'
-[param.patterns, param.labels, patterns_test, labels_test] = load_dataset_horseSeg(param.data_name, param.data_path);
+param.data_name = datasetName; % 'horseSeg_small' or 'horseSeg_medium' or 'horseSeg_large'
+if strcmpi(datasetName, 'horseSeg_large')
+    [param.patterns, param.labels, patterns_test, labels_test] = load_dataset_horseSeg_featuresOnDisk(param.data_name, param.data_path);
+else
+    [param.patterns, param.labels, patterns_test, labels_test] = load_dataset_horseSeg(param.data_name, param.data_path);
+end
 
 param.oracleFn = @segmentation_pairwisePotts_oracle;
 param.featureFn = @segmentation_pairwisePotts_featuremap;
@@ -47,33 +58,32 @@ switch param.lossType
 end
 
 %% main parameters
-setupName = ['BCFW_hybrid', ...
-    '_lambda',num2str(lambda), ...
-    '_gapThreshold',num2str(gap_threshold), ...
+setupName = ['regPath', ...
     '_numPasses',num2str(num_passes),...
-    '_timeBudget', num2str(time_budget), ...
+    '_seed', num2str(rand_seed), ...
+    '_gapCheck', num2str(gap_check), ...
     '_sample_',sample, ...
     '_useCache', num2str(useCache), ...
     '_cacheNu', num2str(cacheNu), ...
     '_cacheFactor', num2str(cacheFactor), ...
-    '_maxCacheSize', num2str(maxCacheSize), ...
     '_stepType', num2str(stepType), ...
-    '_gapCheck', num2str(gap_check), ...
-    '_seed', num2str(rand_seed)];
-    
+    '_timeBudget', num2str(time_budget), ...
+    '_maxCacheSize', num2str(maxCacheSize), ...
+    '_A', num2str(A), ...
+    '_AplusB', num2str( AplusB ), ...
+    '_epsRegPath', num2str(eps_reg_path),...
+    '_trueGap', num2str(true_gap)];
+
 %% prepare folder for the results
 mkdir( resultPath );
 resultFile = fullfile(resultPath, ['results_',setupName,'.mat']);
 modelFile = fullfile(resultPath, ['models_',setupName,'.mat']);
 
 %% run BCFW
+% options structure:
 options = struct;
 
-% lambda
-options.lambda = lambda;
-
 % stopping parameters
-options.gap_threshold = gap_threshold;
 options.num_passes = num_passes; % max number of passes through data
 options.time_budget = time_budget;
 
@@ -98,20 +108,35 @@ options.gap_check = gap_check; % how often to compute the true gap
 options.rand_seed = rand_seed; % random seed
 
 options.quit_passes_heuristic_gap = true; % quit the block-coordinate passes when the heuristic gap is below options.gap_threshold
-options.true_gap_when_converged = true; % require true gap when method converges
+options.true_gap_when_converged = true_gap; % require true gap when method converges
 
+% multi-lambda parameters
+options.quit_passes_heuristic_gap_eps_multiplyer = 0.8;
+
+% no regularixation path
+options.regularization_path = true;
+options.regularization_path_min_lambda = 1e-5;
+options.regularization_path_a = A;
+options.regularization_path_b = AplusB - A;
+if options.regularization_path_b <= 0
+    fprintf( 'CAUTION (%s)! parameter be cannot be negative, A = %f, AplusB = %f!\n', mfilename, A, AplusB ) ;
+    return;
+end
+options.regularization_path_eps = eps_reg_path;
+
+% for debugging
+options.check_lambda_change = false;
 
 % run the solver
 if ~exist(modelFile, 'file')
-    [model, ~, ~, progress] = solver_BCFW_hybrid(param, options);
-    save(modelFile, '-struct', 'progress', '-v7.3' );
+    [model, ~, ~, progress] = solver_multiLambda_BCFW_hybrid(param, options);
+    save(modelFile, 'progress', '-v7.3' );
 else
-    progress = load(modelFile);
+    load(modelFile, 'progress');
 end
 
 % evaluate the models
 if ~exist(resultFile, 'file')
-    info = evaluate_models_fast( progress, param, options.lambda, param.patterns, param.labels, patterns_test, labels_test);
-    info.lambda = progress.lambda;
-    save(resultFile, '-struct', 'info', '-v7.3' );
+    info = evaluate_regPath_models( param, progress );
+    save(resultFile, 'info', '-v7.3' );
 end

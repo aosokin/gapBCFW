@@ -1,5 +1,5 @@
-function varargout = task_launcher(task, varargin )
-%task_launcher launches jobs represent by full parameters sets
+function varargout = task_launcher_combineArgs(task, varargin )
+%task_launcher_combineArgs launches jobs by combining all parameters
 
 if ischar(task)
    type_task = exist(task);
@@ -27,16 +27,16 @@ if nargin_fn < numel(varargin)
 end
 
 % evaluate number of jobs
-n_jobs = max(cellfun(@numel, varargin));
-for a=1:numel(varargin)
-    if ~iscell(varargin{a})
-        error('Input argument %d is not a cells array', a);
-    end
-    if numel(varargin{a}) ~= n_jobs && numel(varargin{a}) ~= 1
-        error('Input argument %d has wrong number of values: has to have number of jobs or 1');
-    end
-end
-    
+n_jobs = prod(cellfun(@numel, varargin));
+
+% combine arguments   
+combine = 1:length(varargin{1});
+
+for i = 2 : length(varargin)            
+    newcombine = kron(1:length(varargin{i}), ones(1, size(combine, 2)));
+    combine = repmat(combine, 1, length(varargin{i}));            
+    combine = [combine; newcombine];
+end 
 
 % launching jobs
 fprintf('Launching %d jobs for %s \n', n_jobs, task);
@@ -49,11 +49,7 @@ end
 for j=1:n_jobs
     cur_arg = cell(1, numel(varargin));
     for a=1:numel(varargin)
-        if length(varargin{a}) == n_jobs
-            cur_arg{a} = varargin{a}{j};
-        else
-            cur_arg{a} = varargin{a}{1};
-        end
+        cur_arg{a} = varargin{a}{combine(a,j)};
     end
     % launching task number j
     fprintf('Launching task %d out of %d....\n', j, n_jobs);

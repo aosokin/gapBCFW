@@ -22,15 +22,14 @@ stepType        = {1, 2};
 gap_check       = {10};
 rand_seed       = num2cell(6:10);
 
-task_launcher('ocr_large_BCFW_hybrid', ...
+task_launcher_combineArgs('ocr_large_BCFW_hybrid', ...
     {dataPath}, {resultPath}, lambda, gap_threshold, num_passes, time_budget, ...
     sample, useCache, cacheNu, cacheFactor, ... 
     maxCacheSize, stepType, gap_check, rand_seed);
 
 
-% % Note that in our experiments, we used a toolbox designed for our cluster
-% % named APT (https://github.com/iXce/APT), here is the exact code that run
-% % for our cluster:
+% % Note that in our experiments, we used an APT toolbox designed for our cluster
+% % (https://github.com/iXce/APT). Here is the exact code that we ran:
 %
 % APT_params();
 % global APT_PARAMS;

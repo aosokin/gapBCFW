@@ -26,6 +26,13 @@ download_wget([url_release,'/','results_icml2016.zip'], data_path);
 fprintf('Uncompressing files...\n');
 unzip(fullfile(data_path, 'results_icml2016.zip'), data_path);
 
+fprintf('Downloading processed regularization path...\n')
+download_wget([url_release,'/','results_regPath_icml2016.zip'], data_path);
+
+fprintf('Uncompressing files...\n');
+unzip(fullfile(data_path, 'results_regPath_icml2016.zip'), data_path);
+
+
 end
 
 

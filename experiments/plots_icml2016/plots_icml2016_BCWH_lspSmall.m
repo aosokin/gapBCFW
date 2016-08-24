@@ -1,3 +1,4 @@
+% Figure 6 LSP-small
 
 %% init
 methodDisplayName = cell(0,0);

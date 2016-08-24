@@ -1,3 +1,6 @@
+% Figure 5 OCR-large
+
+%% init
 methodDisplayName = cell(0,0);
 methodFile = cell(0,0);
 methodLine = cell(0,0);
