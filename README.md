@@ -66,7 +66,7 @@ Users of these packages can easily use our package as well.
 
 ### Reproducing our experiments
 
-Folder `experiments` contains code to reproduce Figures 3, 5, 6 of the [ICML 2016 paper](http://jmlr.org/proceedings/papers/v48/osokin16-supp.pdf).
+Folder `experiments` contains code to reproduce Figures 3, 5, 6, 8 of the [ICML 2016 paper](http://jmlr.org/proceedings/papers/v48/osokin16-supp.pdf).
 
 To just reproduce the plots, go to subfolder `experiments/plots_icml2016`, download our result files by running `download_results.m`, run plotting scripts
 * `plots_icml2016_BCWH_ocrLarge.m`
@@ -74,14 +74,28 @@ To just reproduce the plots, go to subfolder `experiments/plots_icml2016`, downl
 * `plots_icml2016_BCWH_horseSegSmall.m`
 * `plots_icml2016_BCWH_horseSegMedium.m`
 * `plots_icml2016_BCWH_horseSegLarge.m`
-* `plots_icml2016_BCWH_lspSmall.m`.
+* `plots_icml2016_BCWH_lspSmall.m`
+* `plots_icml2016_regPath_ocrSmall.m`
+* `plots_icml2016_regPath_ocrLarge.m`
+* `plots_icml2016_regPath_horseSegSmall.m`
+* `plots_icml2016_regPath_horseSegMedium.m`
 
-To rerun the whole experiment, use scripts 
+To rerun the experiment of section 5.1, use scripts 
 * `experiments/ocr_dataset/ocr_large_BCFW_hybrid_run_experiments.m`
 * `experiments/conll_dataset/conll_BCFW_hybrid_run_experiments.m`
 * `experiments/horseSeg_dataset/horse_small_BCFW_hybrid_run_experiments.m`
 * `experiments/horseSeg_dataset/horse_medium_BCFW_hybrid_run_experiments.m`
 * `experiments/horseSeg_dataset/horse_large_BCFW_hybrid_run_experiments.m`
 * `experiments/LSP_dataset/lsp_small_BCFW_hybrid_run_experiments.m`
+
+To rerun the experiment of section 5.2, use scripts 
+* `experiments/ocr_dataset/regularization_path/ocr_small_regPath_run_experiments.m`
+* `experiments/ocr_dataset/regularization_path/ocr_small_multiLambda_run_experiments.m`
+* `experiments/ocr_dataset/regularization_path/ocr_large_regPath_run_experiments.m`
+* `experiments/ocr_dataset/regularization_path/ocr_large_multiLambda_run_experiments.m`
+* `experiments/horseSeg_dataset/regularization_path/horse_small_regPath_run_experiments.m`
+* `experiments/horseSeg_dataset/regularization_path/horse_small_multiLambda_run_experiments.m`
+* `experiments/horseSeg_dataset/regularization_path/horse_medium_regPath_run_experiments.m`
+* `experiments/horseSeg_dataset/regularization_path/horse_medium_multiLambda_run_experiments.m`
 
 Note, that to run all experiments you will need significant computational resources. We recommend using a cluster to run the experiments in reasonable time.
