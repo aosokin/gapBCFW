@@ -18,8 +18,8 @@ if ~exist(data_path, 'dir')
 end
 
 % downloading
-download_wget('http://www.seas.upenn.edu/~taskar/ocr/letter.names', data_path );
-download_wget('http://www.seas.upenn.edu/~taskar/ocr/letter.data.gz', data_path);
+download_wget('http://ai.stanford.edu/~btaskar/ocr/letter.names', data_path );
+download_wget('http://ai.stanford.edu/~btaskar/ocr/letter.data.gz', data_path);
 
 % uncompress
 gunzip(fullfile(data_path, 'letter.data.gz'), data_path);
